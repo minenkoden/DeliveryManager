@@ -1,0 +1,23 @@
+{
+  "name": "MD/DeliveryManager",
+  "description": "Delivery manager on each category",
+  "license": [
+    "OSL-3.0"
+  ],
+  "type": "magento2-module",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "Minenko Denys",
+      "email": "minenko.den@gmail.com",
+      "homepage": "https://github.com/minenkoden",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "files": [ "registration.php" ],
+    "psr-4": {
+      "MD\\DeliveryManager\\": ""
+    }
+  }
+}
