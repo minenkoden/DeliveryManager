@@ -55,11 +55,12 @@ class SaveAfter implements ObserverInterface
             $email = $maxLevelElements[$index]['deliveryEmail'];
             $emailData = array(
                 "orderNumber" => $order->getIncrementId(),
-                "customerFirstName" => '',
+                "customerFirstName" => 'TEST',
                 "sku" => $product->getSku(),
                 "name" => $product->getName(),
                 "qty" => $product->getQty(),
                 "price" => $product->getPrice(),
+                "shippingAddress" => $product->getShippingAddress(),
             );
             if(array_key_exists($email, $mailsToSend))
             {
@@ -68,5 +69,59 @@ class SaveAfter implements ObserverInterface
                 $mailsToSend[$email] = array($emailData);
             }
         }
+
+
+        foreach (array_keys($mailsToSend) as $mail){
+
+            $customerFirstName = '';
+            $orderNumber = '';
+            $shippingAddress = '';
+            $orderedItems = array();
+
+            /* Here we prepare data for our email  */
+            foreach ($mailsToSend[$mail] as $item) {
+                $orderNumber = $item['orderNumber'];
+                $customerFirstName = $item['customerFirstName'];
+                $shippingAddress = $item['shippingAddress'];
+                $orderedItems[] = array(
+                    "sku" => $item['sku'],
+                    "name" => $item['name'],
+                    "qty" => $item['qty'],
+                    "price" => $item['price'],
+                );
+            }
+
+            /* Receiver Detail  */
+            $receiverInfo = [
+                'name' => $mail,
+                'email' => $mail,
+            ];
+
+
+            /* Sender Detail  */
+            $senderInfo = [
+                'name' => 'Magento 2 Store',
+                'email' => 'adm.farmaz@gmail.com',
+            ];
+
+
+            /* Assign values for your template variables  */
+            $emailTempVariables = array();
+
+            $emailTempVariables['orderNumber'] = $orderNumber;
+            $emailTempVariables['shippingAddress'] = $shippingAddress;
+            $emailTempVariables['customerFirstName'] = $customerFirstName;
+            $emailTempVariables['items'] = $orderedItems;
+
+
+
+            $objectManager->get('MD\DeliveryManager\Helper\Email')->mailSendMethod(
+                $emailTempVariables,
+                $senderInfo,
+                $receiverInfo
+            );
+        }
+        //var_dump($emailTempVariables);die;
+
     }
 }
