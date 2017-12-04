@@ -13,6 +13,10 @@ class SaveAfter implements ObserverInterface
         $allOrderItems = $order->getAllVisibleItems();
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        $orderObj = $objectManager->get('Magento\Sales\Model\Order');
+        $orderData = $orderObj->loadByIncrementId($order->getIncrementId());
+
         $productLoader = $objectManager->get('Magento\Catalog\Model\ProductFactory');
         $categoryLoader = $objectManager->create('Magento\Catalog\Model\Category');
 
@@ -58,10 +62,12 @@ class SaveAfter implements ObserverInterface
                 "customerFirstName" => 'TEST',
                 "sku" => $product->getSku(),
                 "name" => $product->getName(),
-                "qty" => $product->getQty(),
+                "qty" => $orderItem->getQtyOrdered(),
                 "price" => $product->getPrice(),
-                "shippingAddress" => $product->getShippingAddress(),
+                /*"shippingAddress" => $orderObj->getShippingAddress()->getFormated(),
+                "billingAddress" => $orderObj->getBillingAddress()->getFormated(),*/
             );
+
             if(array_key_exists($email, $mailsToSend))
             {
                 $mailsToSend[$email][] = $emailData;
@@ -78,11 +84,10 @@ class SaveAfter implements ObserverInterface
             $shippingAddress = '';
             $orderedItems = array();
 
-            /* Here we prepare data for our email  */
             foreach ($mailsToSend[$mail] as $item) {
                 $orderNumber = $item['orderNumber'];
                 $customerFirstName = $item['customerFirstName'];
-                $shippingAddress = $item['shippingAddress'];
+                //$shippingAddress = $item['shippingAddress'];
                 $orderedItems[] = array(
                     "sku" => $item['sku'],
                     "name" => $item['name'],
@@ -97,19 +102,17 @@ class SaveAfter implements ObserverInterface
                 'email' => $mail,
             ];
 
-
             /* Sender Detail  */
             $senderInfo = [
                 'name' => 'Magento 2 Store',
                 'email' => 'adm.farmaz@gmail.com',
             ];
 
-
-            /* Assign values for your template variables  */
             $emailTempVariables = array();
 
             $emailTempVariables['orderNumber'] = $orderNumber;
-            $emailTempVariables['shippingAddress'] = $shippingAddress;
+            $emailTempVariables['shippingAddress'] = $orderData->getShippingAddress();
+            //$emailTempVariables['billingAddress'] = ;
             $emailTempVariables['customerFirstName'] = $customerFirstName;
             $emailTempVariables['items'] = $orderedItems;
 

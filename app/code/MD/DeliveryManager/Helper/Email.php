@@ -49,6 +49,18 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function mailSendMethod($emailTemplateVariables,$senderInfo,$receiverInfo)
     {
+        $itemHtml = '';
+        $totals = 0;
+        foreach ($emailTemplateVariables['items'] as $item){
+            $itemHtml .= '<tr>';
+            $itemHtml .= '<th class="item">' . $item['sku'] . '</th>';
+            $itemHtml .= '<th class="item">' . $item['name'] . '</th>';
+            $itemHtml .= '<th class="item">' . $item['qty'] . '</th>';
+            $itemHtml .= '<th class="item">' . $item['price']*$item['qty'] . '</th>';
+            $itemHtml .= '</tr>';
+            $totals += $item['price']*$item['qty'];
+        }
+
         $store = $this->_storeManager->getStore()->getId();
         $transport = $this->_transportBuilder->setTemplateIdentifier('manager_delivery_mail')
             ->setTemplateOptions(['area' => 'adminhtml', 'store' => $store])
@@ -57,7 +69,10 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
                     'store' => $this->_storeManager->getStore(),
                     'orderNumber' => $emailTemplateVariables['orderNumber'],
                     'customerFirstName' => $emailTemplateVariables['customerFirstName'],
-                    'items' => $emailTemplateVariables['items']
+                    //'billingAddress' => $emailTemplateVariables['billingAddress'],
+                    'shippingAddress' => $emailTemplateVariables['shippingAddress'],
+                    'items' => $itemHtml,
+                    'totals'=> 'TOTAL: ' . $totals
                 ]
             )
             ->setFrom('general')
