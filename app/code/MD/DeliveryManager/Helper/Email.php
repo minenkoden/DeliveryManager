@@ -56,7 +56,8 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
                 [
                     'store' => $this->_storeManager->getStore(),
                     'orderNumber' => $emailTemplateVariables['orderNumber'],
-                    'customerFirstName' => $emailTemplateVariables['customerFirstName']
+                    'customerFirstName' => $emailTemplateVariables['customerFirstName'],
+                    'items' => $emailTemplateVariables['items']
                 ]
             )
             ->setFrom('general')
